@@ -59,25 +59,38 @@
                         </div>
 
                         <!-- Imagen -->
-                        <div class="mb-3">
-                            <label class="form-label">Imagen Actual</label>
-                            @if($product->image)
-                                <div class="mb-2">
-                                    <img src="{{ asset('storage/' . $product->image) }}" width="100" height="100" class="img-thumbnail">
-                                </div>
-                            @else
-                                <p class="text-muted">No hay imagen actual.</p>
-                            @endif
-                            <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" accept="image/*">
-                            <small class="text-muted">Deja vacío para mantener la actual.</small>
-                            @error('image') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
+                       <!-- Imagen actual con zoom -->
+<div class="mb-2">
+    <img src="{{ asset('storage/' . $product->image) }}" 
+         alt="{{ $product->name }}" 
+         width="100" height="100" 
+         class="img-thumbnail" 
+         style="cursor: pointer;"
+         data-bs-toggle="modal" 
+         data-bs-target="#zoomModal"
+         onclick="document.getElementById('zoomModalImage').src='{{ asset('storage/' . $product->image) }}'">
+    <p class="text-muted small mt-1">Haz clic en la imagen para ampliarla</p>
+</div>
 
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('productos.index') }}" class="btn btn-secondary">Volver</a>
                             <button type="submit" class="btn btn-primary">Actualizar Producto</button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- MODAL ZOOM DE IMAGEN -->
+    <div class="modal fade" id="zoomModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">🖼️ Vista previa de la imagen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="zoomModalImage" src="" alt="Zoom" class="img-fluid" style="max-height: 75vh; border-radius: 8px;">
                 </div>
             </div>
         </div>
