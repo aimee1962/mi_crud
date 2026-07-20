@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Mi Tienda Admin')</title>
     
-    <!-- Bootstrap 5 CDN -->
+    <!-- Bootstrap 5 + Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* Reset y estructura general */
+        /* RESET Y ESTRUCTURA GENERAL */
         body {
             background-color: #f4f6f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* SIDEBAR (Menú lateral) */
+        /* ===== SIDEBAR (Menú lateral) ===== */
         .sidebar {
             position: fixed;
             top: 0;
@@ -68,14 +69,14 @@
             text-align: center;
         }
 
-        /* CONTENIDO PRINCIPAL */
+        /* ===== CONTENIDO PRINCIPAL ===== */
         .main-content {
             margin-left: 260px;
             padding: 20px;
             min-height: 100vh;
         }
 
-        /* Navbar superior dentro del contenido */
+        /* ===== TOP NAVBAR ===== */
         .top-navbar {
             background: white;
             padding: 15px 20px;
@@ -93,7 +94,7 @@
             color: #1e1e2f;
         }
 
-        /* Responsive: ocultar sidebar en móviles */
+        /* ===== RESPONSIVE (Móviles) ===== */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -117,8 +118,8 @@
             font-size: 1.5rem;
             color: #1e1e2f;
         }
-        
-        /* Tarjetas del dashboard */
+
+        /* ===== TARJETAS DEL DASHBOARD ===== */
         .card {
             border-radius: 12px;
             border: none;
@@ -131,7 +132,8 @@
         .card .display-4 {
             font-weight: 700;
         }
-        
+
+        /* Colores de las tarjetas (gradientes) */
         .bg-primary-gradient {
             background: linear-gradient(145deg, #4e73df, #224abe);
         }
@@ -144,82 +146,37 @@
         .bg-info-gradient {
             background: linear-gradient(145deg, #36b9cc, #258391);
         }
+
+        /* ===== PAGINADO CLÁSICO (Solo estilos, sin flechas ni :contains) ===== */
+        .pagination .page-link {
+            padding: 4px 10px !important;
+            font-size: 0.85rem !important;
+            border-radius: 6px !important;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
+            background: white;
+            transition: all 0.15s ease;
+        }
+        .pagination .page-link:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+            color: #0f172a;
+        }
+        .pagination .page-item.active .page-link {
+            background: #0d6efd !important;
+            border-color: #0d6efd !important;
+            color: white !important;
+            font-weight: 600;
+        }
+        .pagination .page-item.disabled .page-link {
+            opacity: 0.5;
+            pointer-events: none;
+        }
     </style>
 </head>
-    <!-- Contenedor para TOASTS (Notificaciones flotantes) -->
-    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050; max-width: 350px;">
-        @if(session('success'))
-            <div class="toast align-items-center text-white bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="toast align-items-center text-white bg-danger border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            </div>
-        @endif
-    </div>
-
-    <script>
-        // Inicializar los toasts automáticamente al cargar la página
-        document.addEventListener('DOMContentLoaded', function () {
-            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
-            toastElList.forEach(function (toastEl) {
-                var toast = new bootstrap.Toast(toastEl, { delay: 4000 });
-                toast.show();
-            });
-        });
-    </script>
 <body>
 
-    <!-- CONTENEDOR DE TOASTS (Notificaciones flotantes) -->
-    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050; max-width: 350px;">
-        @if(session('success'))
-            <div class="toast align-items-center text-white bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="toast align-items-center text-white bg-danger border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            </div>
-        @endif
-    </div>
-
-    <script>
-        // Inicializar los toasts automáticamente al cargar la página
-        document.addEventListener('DOMContentLoaded', function () {
-            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
-            toastElList.forEach(function (toastEl) {
-                var toast = new bootstrap.Toast(toastEl, { delay: 4000 });
-                toast.show();
-            });
-        });
-    </script>
-
-    <!-- SIDEBAR (Menú lateral) -->
+    <!-- ===== SIDEBAR ===== -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <i class="fas fa-store-alt"></i> Mi Tienda
@@ -243,9 +200,10 @@
         </ul>
     </nav>
 
-    <!-- CONTENIDO PRINCIPAL -->
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <div class="main-content">
-        <!-- Top Navbar (barra superior) -->
+
+        <!-- Top Navbar -->
         <div class="top-navbar">
             <div>
                 <button class="menu-toggle" id="menuToggle">
@@ -254,15 +212,32 @@
                 <h4>@yield('title', 'Panel de Control')</h4>
             </div>
             <div>
-                <span class="badge bg-success">Bienvenido/a</span>
+                @auth
+                    <span class="badge bg-success" style="font-size: 1rem; padding: 8px 15px;">
+                        <i class="fas fa-user-circle"></i> {{ auth()->user()->name }}
+                    </span>
+                    <a href="{{ route('logout') }}" 
+                       class="btn btn-outline-danger btn-sm ms-2"
+                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+                @else
+                    <span class="badge bg-secondary">
+                        <i class="fas fa-user-circle"></i> Invitado
+                    </span>
+                @endauth
             </div>
         </div>
 
-        <!-- Aquí se inyecta el contenido de cada página -->
+        <!-- Contenido dinámico de cada página -->
         @yield('content')
+
     </div>
 
-    <!-- Script de Bootstrap y funcionalidad del sidebar -->
+    <!-- ===== SCRIPTS ===== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Toggle para el menú en móviles
