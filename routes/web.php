@@ -1,18 +1,14 @@
 <?php
 
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CategoryController; 
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController; // <--- IMPORTA ESTE CONTROLADOR
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard'); // Redirige a /dashboard
 });
 
-// Con esto tenemos TODAS las rutas CRUD:
-// GET /productos (index)
-// GET /productos/create (create)
-// POST /productos (store)
-// GET /productos/{id}/edit (edit)
-// PUT/PATCH /productos/{id} (update)
-// DELETE /productos/{id} (destroy)
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/productos/exportar', [ProductController::class, 'exportCsv'])->name('productos.export');
 Route::resource('productos', ProductController::class);
 Route::resource('categorias', CategoryController::class);

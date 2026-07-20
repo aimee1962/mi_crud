@@ -19,7 +19,7 @@ public function index()
     $direction = request('direction', 'asc'); // Dirección por defecto: asc
 
     // 🔒 Lista blanca para evitar inyecciones SQL (solo permitir estos campos)
-    $allowedSorts = ['id', 'name', 'price', 'created_at'];
+    $allowedSorts = ['id', 'name', 'price', 'stock','created_at'];
     if (!in_array($sort, $allowedSorts)) {
         $sort = 'id';
     }
@@ -57,6 +57,7 @@ public function index()
         $request->validate([
             'name'        => 'required|string|max:255',
             'price'       => 'required|numeric|min:0',
+            'stock'       => 'required|integer|min:0',
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id', // <-- Valida que exista en la BD
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB máx.
@@ -72,6 +73,7 @@ public function index()
         Product::create([
             'name'        => $request->name,
             'price'       => $request->price,
+            'stock'       => $request->stock,
             'description' => $request->description,
             'category_id' => $request->category_id, // <-- Guarda la categoría
             'image'       => $imagePath,
@@ -105,13 +107,14 @@ public function index()
         $request->validate([
             'name'        => 'required|string|max:255',
             'price'       => 'required|numeric|min:0',
+            'stock'       => 'required|integer|min:0',
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         // Preparar los datos a actualizar (sin la imagen, se maneja aparte)
-        $data = $request->only(['name', 'price', 'description', 'category_id']);
+        $data = $request->only(['name', 'price', 'stock','description', 'category_id']);
 
         // Si suben una imagen nueva, eliminar la anterior y guardar la nueva
         if ($request->hasFile('image')) {
@@ -150,4 +153,44 @@ public function index()
             ->route('productos.index')
             ->with('success', '¡Producto eliminado!');
     }
+    /**
+ * Exporta todos los productos a un archivo CSV.
+ */
+public function exportCsv()
+{
+    // 1. Traer todos los productos con su categoría
+    $products = Product::with('category')->get();
+
+    // 2. Configurar las cabeceras para la descarga
+    $headers = [
+        'Content-Type' => 'text/csv',
+        'Content-Disposition' => 'attachment; filename=productos_' . date('Y-m-d') . '.csv',
+    ];
+
+    // 3. Crear el contenido del CSV
+    $callback = function() use ($products) {
+        $file = fopen('php://output', 'w');
+
+        // Escribir la fila de encabezados (nombres de columnas)
+        fputcsv($file, ['ID', 'Nombre', 'Precio', 'Descripción', 'Categoría', 'Fecha de Creación']);
+
+        // Escribir cada producto
+        foreach ($products as $product) {
+            fputcsv($file, [
+                $product->id,
+                $product->name,
+                $product->price,
+                $product->stock,
+                $product->description,
+                $product->category->name ?? 'Sin categoría',
+                $product->created_at,
+            ]);
+        }
+
+        fclose($file);
+    };
+
+    // 4. Devolver la respuesta como descarga
+    return response()->stream($callback, 200, $headers);
+}
 }
