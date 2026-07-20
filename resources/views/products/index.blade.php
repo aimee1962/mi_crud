@@ -104,13 +104,18 @@
                     <tr>
                         <td>{{ $product->id }}</td>
                         <td>
-                            @if($product->image)
-                                <img src="{{ asset('storage/' . $product->image) }}" 
-                                     alt="{{ $product->name }}" 
-                                     width="50" height="50" class="img-thumbnail">
-                            @else
-                                <span class="text-muted">Sin imagen</span>
-                            @endif
+   @if($product->image)
+        <img src="{{ asset('storage/' . $product->image) }}" 
+             alt="{{ $product->name }}" 
+             width="50" height="50" 
+             class="img-thumbnail product-thumbnail" 
+             style="cursor: pointer;"
+             data-bs-toggle="modal" 
+             data-bs-target="#zoomModal"
+             onclick="document.getElementById('zoomModalImage').src='{{ asset('storage/' . $product->image) }}'">
+    @else
+        <span class="text-muted">Sin imagen</span>
+    @endif
                         </td>
                         <td>{{ $product->name }}</td>
                         <td>
@@ -151,5 +156,19 @@
     <!-- PAGINACIÓN -->
     <div class="d-flex justify-content-center mt-4">
         {{ $products->links() }}
+    </div>
+        <!-- MODAL ZOOM DE IMAGEN -->
+    <div class="modal fade" id="zoomModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">🖼️ Vista previa de la imagen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="zoomModalImage" src="" alt="Zoom" class="img-fluid" style="max-height: 75vh; border-radius: 8px;">
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
