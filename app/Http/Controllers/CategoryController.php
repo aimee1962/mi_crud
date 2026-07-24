@@ -13,13 +13,31 @@ class CategoryController extends Controller
     public function index()
     {
         $search = request('search');
+        $sort = request('sort', 'name');
+        $direction = request('direction', 'asc');
 
-        $categories = Category::when($search, function ($query, $search) {
-            return $query->where('name', 'LIKE', "%{$search}%");
-        })
-        ->orderBy('id', 'desc')
-        ->paginate(5)
-        ->appends(['search' => $search]);
+        // Columnas permitidas para ordenar (incluimos 'products_count')
+        $allowedSorts = ['id', 'name', 'products_count'];
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'name';
+        }
+
+        // Construir la consulta con el conteo de productos
+        $query = Category::withCount('products');
+
+        // Búsqueda por nombre
+        if ($search) {
+            $query->where('name', 'LIKE', "%{$search}%");
+        }
+
+        // Aplicar orden
+        $categories = $query->orderBy($sort, $direction)
+            ->paginate(5)
+            ->appends([
+                'search' => $search,
+                'sort' => $sort,
+                'direction' => $direction
+            ]);
 
         return view('categories.index', compact('categories'));
     }
@@ -46,7 +64,7 @@ class CategoryController extends Controller
         ]);
 
         return redirect()->route('categorias.index')
-                         ->with('success', '¡Categoría creada exitosamente!');
+            ->with('success', '¡Categoría creada exitosamente!');
     }
 
     /**
@@ -74,7 +92,7 @@ class CategoryController extends Controller
         ]);
 
         return redirect()->route('categorias.index')
-                         ->with('success', '¡Categoría actualizada exitosamente!');
+            ->with('success', '¡Categoría actualizada exitosamente!');
     }
 
     /**
@@ -87,12 +105,12 @@ class CategoryController extends Controller
         // Verificar si la categoría tiene productos
         if ($category->products()->count() > 0) {
             return redirect()->route('categorias.index')
-                             ->with('error', 'No se puede eliminar la categoría porque tiene productos asociados.');
+                ->with('error', 'No se puede eliminar la categoría porque tiene productos asociados.');
         }
 
         $category->delete();
 
         return redirect()->route('categorias.index')
-                         ->with('success', '¡Categoría eliminada exitosamente!');
+            ->with('success', '¡Categoría eliminada exitosamente!');
     }
 }

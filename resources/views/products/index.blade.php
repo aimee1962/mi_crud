@@ -19,11 +19,8 @@
     <form action="{{ route('productos.index') }}" method="GET" class="mb-3">
         <div class="row g-2">
             <div class="col-md-8">
-                <input type="text" 
-                       name="search" 
-                       class="form-control" 
-                       placeholder="🔍 Buscar por nombre..." 
-                       value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control" placeholder="🔍 Buscar por nombre..."
+                    value="{{ request('search') }}">
             </div>
             <div class="col-md-4">
                 <button type="submit" class="btn btn-primary w-100">
@@ -32,50 +29,67 @@
             </div>
         </div>
         <!-- Mantener el orden actual en la búsqueda -->
-        <input type="hidden" name="sort" value="{{ request('sort', 'id') }}">
+        <input type="hidden" name="sort" value="{{ request('sort', 'name') }}">
         <input type="hidden" name="direction" value="{{ request('direction', 'asc') }}">
     </form>
 
-    <!-- TABLA DE PRODUCTOS -->
+    <!-- TABLA DE PRODUCTOS (SIN ID) -->
     <div class="table-responsive">
         <table class="table table-striped table-bordered table-hover">
             <thead class="table-dark">
                 <tr>
                     @php
-                        $currentSort = request('sort', 'id');
+                        $currentSort = request('sort', 'name');
                         $currentDir = request('direction', 'asc');
                     @endphp
 
-                    <th>
-                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'id', 'direction' => ($currentSort == 'id' && $currentDir == 'asc') ? 'desc' : 'asc']) }}" 
-                           class="text-white text-decoration-none">
-                            ID
-                            @if($currentSort == 'id') 
-                                <i class="fas fa-sort-{{ $currentDir == 'asc' ? 'up' : 'down' }}"></i>
-                            @endif
-                        </a>
-                    </th>
+                    {{-- Imagen --}}
                     <th>Imagen</th>
+
+                    {{-- Nombre --}}
                     <th>
-                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'name', 'direction' => ($currentSort == 'name' && $currentDir == 'asc') ? 'desc' : 'asc']) }}" 
-                           class="text-white text-decoration-none">
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'name', 'direction' => ($currentSort == 'name' && $currentDir == 'asc') ? 'desc' : 'asc']) }}"
+                            class="text-white text-decoration-none">
                             Nombre
-                            @if($currentSort == 'name') 
+                            @if($currentSort == 'name')
                                 <i class="fas fa-sort-{{ $currentDir == 'asc' ? 'up' : 'down' }}"></i>
                             @endif
                         </a>
                     </th>
-                    <th>Categoría</th>
+
+                    {{-- Categoría (orden por nombre de categoría) --}}
                     <th>
-                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'price', 'direction' => ($currentSort == 'price' && $currentDir == 'asc') ? 'desc' : 'asc']) }}" 
-                           class="text-white text-decoration-none">
-                            Precio
-                            @if($currentSort == 'price') 
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'category_name', 'direction' => ($currentSort == 'category_name' && $currentDir == 'asc') ? 'desc' : 'asc']) }}"
+                            class="text-white text-decoration-none">
+                            Categoría
+                            @if($currentSort == 'category_name')
                                 <i class="fas fa-sort-{{ $currentDir == 'asc' ? 'up' : 'down' }}"></i>
                             @endif
                         </a>
                     </th>
-                    <th>Stock</th>
+
+                    {{-- Precio --}}
+                    <th>
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'price', 'direction' => ($currentSort == 'price' && $currentDir == 'asc') ? 'desc' : 'asc']) }}"
+                            class="text-white text-decoration-none">
+                            Precio
+                            @if($currentSort == 'price')
+                                <i class="fas fa-sort-{{ $currentDir == 'asc' ? 'up' : 'down' }}"></i>
+                            @endif
+                        </a>
+                    </th>
+
+                    {{-- Stock --}}
+                    <th>
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'stock', 'direction' => ($currentSort == 'stock' && $currentDir == 'asc') ? 'desc' : 'asc']) }}"
+                            class="text-white text-decoration-none">
+                            Stock
+                            @if($currentSort == 'stock')
+                                <i class="fas fa-sort-{{ $currentDir == 'asc' ? 'up' : 'down' }}"></i>
+                            @endif
+                        </a>
+                    </th>
+
                     <th>Descripción</th>
                     <th class="text-center">Acciones</th>
                 </tr>
@@ -83,22 +97,22 @@
             <tbody>
                 @forelse($products as $product)
                     <tr>
-                        <td>{{ $product->id }}</td>
+                        {{-- Imagen --}}
                         <td>
                             @if($product->image)
-                                <img src="{{ asset('storage/' . $product->image) }}" 
-                                     alt="{{ $product->name }}" 
-                                     width="50" height="50" 
-                                     class="img-thumbnail product-thumbnail" 
-                                     style="cursor: pointer;"
-                                     data-bs-toggle="modal" 
-                                     data-bs-target="#zoomModal"
-                                     onclick="document.getElementById('zoomModalImage').src='{{ asset('storage/' . $product->image) }}'">
+                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" width="50"
+                                    height="50" class="img-thumbnail product-thumbnail" style="cursor: pointer;"
+                                    data-bs-toggle="modal" data-bs-target="#zoomModal"
+                                    onclick="document.getElementById('zoomModalImage').src='{{ asset('storage/' . $product->image) }}'">
                             @else
                                 <span class="text-muted">Sin imagen</span>
                             @endif
                         </td>
+
+                        {{-- Nombre --}}
                         <td>{{ $product->name }}</td>
+
+                        {{-- Categoría --}}
                         <td>
                             @if($product->category)
                                 <span class="badge bg-info">{{ $product->category->name }}</span>
@@ -106,20 +120,26 @@
                                 <span class="text-muted">Sin categoría</span>
                             @endif
                         </td>
+
+                        {{-- Precio --}}
                         <td>${{ number_format($product->price, 2) }}</td>
+
+                        {{-- Stock --}}
                         <td>{{ $product->stock }}</td>
+
+                        {{-- Descripción --}}
                         <td>{{ Str::limit($product->description, 30) }}</td>
+
+                        {{-- Acciones --}}
                         <td class="text-center">
                             <a href="{{ route('productos.edit', $product->id) }}" class="btn btn-warning btn-sm">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <form action="{{ route('productos.destroy', $product->id) }}" 
-                                  method="POST" style="display:inline-block;">
+                            <form action="{{ route('productos.destroy', $product->id) }}" method="POST"
+                                style="display:inline-block;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" 
-                                        class="btn btn-danger btn-sm" 
-                                        onclick="return confirm('¿Seguro?')">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro?')">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </form>
@@ -127,39 +147,36 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center">No hay productos registrados.</td>
+                        <td colspan="7" class="text-center">No hay productos registrados.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 
-    <!-- PAGINACIÓN CLÁSICA DE LARAVEL (Solo "Anterior" y "Siguiente" + números) -->
+    <!-- PAGINACIÓN PERSONALIZADA -->
     <div class="d-flex justify-content-center mt-4">
-       <!-- PAGINACIÓN PERSONALIZADA SIN FLECHAS (Solo Anterior/Siguiente) -->
-<div class="d-flex justify-content-between align-items-center mt-4">
-    <div>
-        @if ($products->onFirstPage())
-            <span class="btn btn-outline-secondary btn-sm disabled">Anterior</span>
-        @else
-            <a href="{{ $products->previousPageUrl() }}" class="btn btn-outline-primary btn-sm">Anterior</a>
-        @endif
-    </div>
-
-    <div>
-        <span class="text-muted small">
-            Página {{ $products->currentPage() }} de {{ $products->lastPage() }}
-        </span>
-    </div>
-
-    <div>
-        @if ($products->hasMorePages())
-            <a href="{{ $products->nextPageUrl() }}" class="btn btn-outline-primary btn-sm">Siguiente</a>
-        @else
-            <span class="btn btn-outline-secondary btn-sm disabled">Siguiente</span>
-        @endif
-    </div>
-</div>
+        <div class="d-flex justify-content-between align-items-center" style="gap: 20px;">
+            <div>
+                @if ($products->onFirstPage())
+                    <span class="btn btn-outline-secondary btn-sm disabled">Anterior</span>
+                @else
+                    <a href="{{ $products->previousPageUrl() }}" class="btn btn-outline-primary btn-sm">Anterior</a>
+                @endif
+            </div>
+            <div>
+                <span class="text-muted small">
+                    Página {{ $products->currentPage() }} de {{ $products->lastPage() }}
+                </span>
+            </div>
+            <div>
+                @if ($products->hasMorePages())
+                    <a href="{{ $products->nextPageUrl() }}" class="btn btn-outline-primary btn-sm">Siguiente</a>
+                @else
+                    <span class="btn btn-outline-secondary btn-sm disabled">Siguiente</span>
+                @endif
+            </div>
+        </div>
     </div>
 
     <!-- MODAL ZOOM DE IMAGEN -->
@@ -171,7 +188,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <img id="zoomModalImage" src="" alt="Zoom" class="img-fluid" style="max-height: 75vh; border-radius: 8px;">
+                    <img id="zoomModalImage" src="" alt="Zoom" class="img-fluid"
+                        style="max-height: 75vh; border-radius: 8px;">
                 </div>
             </div>
         </div>
